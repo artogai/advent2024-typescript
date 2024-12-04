@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+
+./bin/lint.sh
+if [ $? -ne 0 ]; then
+    echo "Linting failed, commit aborted."
+    exit 1
+fi
+
+./bin/format.sh
+if [ $? -ne 0 ]; then
+    echo "Formatting failed, commit aborted."
+    exit 1
+fi
+
+exit 0

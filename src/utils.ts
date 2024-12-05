@@ -22,3 +22,12 @@ export function unzip<A, B>(arr: readonly [A, B][]): [A[], B[]] {
   }
   return [arr1, arr2];
 }
+
+export function arraysEqual<A>(
+  arr1: readonly A[],
+  arr2: readonly A[],
+): boolean {
+  return (
+    arr1.length === arr2.length && arr1.every((val, idx) => val === arr2[idx])
+  );
+}

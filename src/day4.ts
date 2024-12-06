@@ -65,7 +65,7 @@ function countMas(field: string[][]): number {
         }).join("");
 
         if (CORNER_VALUES.includes(cornerValue)) {
-          acc += 1;
+          acc++;
         }
       }
     }

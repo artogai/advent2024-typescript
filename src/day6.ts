@@ -35,7 +35,7 @@ function directionDelta2Direction(d: readonly [number, number]): Direction {
   } else if (d[0] === 0 && d[1] === -1) {
     return "<";
   } else {
-    throw Error(
+    throw new Error(
       `unknow direction delta: ${d[0].toString()} ${d[1].toString()}`,
     );
   }
@@ -83,7 +83,7 @@ function traverse(
   traverse: for (;;) {
     const pathFlags = pathFlagsByDirection.get(currDir);
     if (pathFlags === undefined) {
-      throw Error(`flags not specified for direction $currDir`);
+      throw new Error(`flags not specified for direction $currDir`);
     }
 
     if (pathFlags[currRow][currCol]) {

@@ -31,3 +31,7 @@ export function arraysEqual<A>(
     arr1.length === arr2.length && arr1.every((val, idx) => val === arr2[idx])
   );
 }
+
+export function arraySum(arr: readonly number[]): number {
+  return arr.reduce((prev, curr) => prev + curr, 0);
+}

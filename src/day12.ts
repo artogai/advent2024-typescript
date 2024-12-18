@@ -3,27 +3,29 @@ import { readLines } from "./utils.js";
 
 type Coord = readonly [number, number];
 
-type Field = string[][];
+type Field = ReadonlyArray<ReadonlyArray<string>>;
 
-type Mask = boolean[][];
+type MaskMut = boolean[][];
 
-type CornerPoint = {
+type Mask = ReadonlyArray<ReadonlyArray<boolean>>;
+
+type CornerPoint = Readonly<{
   delta: Coord;
   isPlanted: boolean;
-};
+}>;
 
-type Corner = CornerPoint[];
+type Corner = ReadonlyArray<CornerPoint>;
 
-type CostFunc = (m: Readonly<Mask>) => number;
+type CostFunc = (m: Mask) => number;
 
-const DIRECTIONS: readonly Coord[] = [
+const DIRECTIONS: ReadonlyArray<Coord> = [
   [0, 1],
   [1, 0],
   [0, -1],
   [-1, 0],
 ];
 
-const BASE_CORNERS: readonly Corner[] = [
+const BASE_CORNERS: ReadonlyArray<Corner> = [
   // XX
   // X.
   [
@@ -49,7 +51,7 @@ const BASE_CORNERS: readonly Corner[] = [
   ],
 ];
 
-const CORNERS: readonly Corner[] = [
+const CORNERS: ReadonlyArray<Corner> = [
   ...BASE_CORNERS,
   ...BASE_CORNERS.map((c) => rotate90(c)),
   ...BASE_CORNERS.map((c) => rotate90(rotate90(c))),
@@ -105,10 +107,10 @@ const part2Cost: CostFunc = (m) => calcArea(m) * calcCorners(m);
 part(part1Cost);
 part(part2Cost);
 
-function part(cost: CostFunc) {
+function part(costFunc: CostFunc) {
   const field = parseField("./input/day12.txt");
   const areas = genAreas(field);
-  const res = areas.reduce((acc, a) => acc + cost(a), 0);
+  const res = areas.reduce((acc, a) => acc + costFunc(a), 0);
   log(res);
 }
 
@@ -116,8 +118,8 @@ function parseField(path: string): Field {
   return readLines(path).map((line) => line.split(""));
 }
 
-function genAreas(f: Field): Mask[] {
-  const areas: Mask[] = [];
+function genAreas(f: Field): MaskMut[] {
+  const areas: MaskMut[] = [];
   for (let i = 0; i < f.length; i++) {
     for (let j = 0; j < f[i].length; j++) {
       if (areas.some((area) => area[i][j])) {
@@ -129,7 +131,7 @@ function genAreas(f: Field): Mask[] {
   return areas;
 }
 
-function traverseArea(start: Coord, f: Field): Mask {
+function traverseArea(start: Coord, f: Field): MaskMut {
   const mask = createEmptyMask(f);
 
   function rec(c: Coord) {
@@ -147,14 +149,14 @@ function traverseArea(start: Coord, f: Field): Mask {
   return mask;
 }
 
-function checkPoint(c: Coord, p: CornerPoint, m: Readonly<Mask>): boolean {
+function checkPoint(c: Coord, p: CornerPoint, m: Mask): boolean {
   const row = c[0] + p.delta[0];
   const col = c[1] + p.delta[1];
 
   return isInBounds([row, col], m) ? p.isPlanted === m[row][col] : !p.isPlanted;
 }
 
-function createEmptyMask<A>(m: ReadonlyArray<ReadonlyArray<A>>): Mask {
+function createEmptyMask<A>(m: ReadonlyArray<ReadonlyArray<A>>): MaskMut {
   return m.map((row) => row.map((_) => false));
 }
 

@@ -23,6 +23,20 @@ export function unzip<A, B>(arr: readonly [A, B][]): [A[], B[]] {
   return [arr1, arr2];
 }
 
+export function arraySplit<A>(arr: A[], splitter: A): A[][] {
+  return arr.reduce((res: A[][], curr: A) => {
+    if (curr === splitter) {
+      res.push([]);
+    } else {
+      if (res.length === 0) {
+        res.push([]);
+      }
+      res[res.length - 1].push(curr);
+    }
+    return res;
+  }, []);
+}
+
 export function arraysEqual<A>(
   arr1: readonly A[],
   arr2: readonly A[],

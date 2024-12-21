@@ -11,7 +11,10 @@
     "typescript-eslint": "^8.16.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "day": "./bin/run.sh",
+    "lint": "npx eslint .",
+    "format": "npx prettier . --write"
   },
   "author": "",
   "license": "ISC",

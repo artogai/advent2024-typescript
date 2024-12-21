@@ -54,3 +54,7 @@ export function equal<A>(
     m1.every((arr1, row) => Arrays.equal(arr1, m2[row], cmp))
   );
 }
+
+export function show<A>(m: RO<A>, showA: (v: A) => string): string {
+  return m.map((row) => row.map(showA).join("")).join("\n");
+}

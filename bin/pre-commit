@@ -1,12 +1,12 @@
 #!/usr/bin/env sh
 
-./bin/lint.sh
+npm run lint
 if [ $? -ne 0 ]; then
     echo "Linting failed, commit aborted."
     exit 1
 fi
 
-./bin/format.sh
+npm run format
 if [ $? -ne 0 ]; then
     echo "Formatting failed, commit aborted."
     exit 1

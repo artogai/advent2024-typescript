@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 
-DAY=$1
+DAYNUM=$1
 
-TS_FILE="src/$DAY.ts"
+TS_FILE="src/day$DAYNUM.ts"
 
 if [[ ! -f $TS_FILE ]]; then
   echo "Error: $TS_FILE not found!"
@@ -11,4 +11,4 @@ fi
 
 npx tsc
 
-node "dist/$DAY.js"
+node "dist/day$DAYNUM.js"

@@ -1,6 +1,6 @@
 import { log } from "console";
-import * as IO from "./utils/io.js";
-import * as Arrays from "./utils/arrays.js";
+import * as IO from "./utils/io";
+import * as Arrays from "./utils/arrays";
 
 part1();
 part2();

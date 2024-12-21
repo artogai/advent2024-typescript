@@ -1,4 +1,4 @@
-import * as Point from "./point.js";
+import * as Point from "./point";
 
 export type Up = "^";
 export type Down = "v";

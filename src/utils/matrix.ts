@@ -1,6 +1,6 @@
-import * as Arrays from "./arrays.js";
-import * as Point from "./point.js";
-import * as IO from "./io.js";
+import * as Arrays from "./arrays";
+import * as Point from "./point";
+import * as IO from "./io";
 
 export type RW<A> = A[][];
 export type RO<A> = ReadonlyArray<ReadonlyArray<A>>;

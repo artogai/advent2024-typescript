@@ -1,6 +1,6 @@
 import { log } from "console";
-import * as Matrix from "./utils/matrix.js";
-import * as Point from "./utils/point.js";
+import * as Matrix from "./utils/matrix";
+import * as Point from "./utils/point";
 
 type Empty = { kind: "empty"; id: "." };
 type Antenna = { kind: "antenna"; id: string; isAntinode: boolean };

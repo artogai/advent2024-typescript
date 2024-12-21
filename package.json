@@ -1,7 +1,6 @@
 {
   "name": "advent2024-typescript",
   "version": "0.0.1",
-  "type": "module",
   "devDependencies": {
     "@eslint/js": "^9.16.0",
     "@types/node": "^22.10.1",

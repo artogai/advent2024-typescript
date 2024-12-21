@@ -1,8 +1,8 @@
-import * as Matrix from "./utils/matrix.js";
+import * as Matrix from "./utils/matrix";
 import { log } from "console";
 import { createHash } from "crypto";
-import * as IO from "./utils/io.js";
-import * as Point from "./utils/point.js";
+import * as IO from "./utils/io";
+import * as Point from "./utils/point";
 
 const dim = [103, 101] as const;
 

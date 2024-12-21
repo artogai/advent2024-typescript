@@ -1,7 +1,7 @@
 import { log } from "console";
-import * as IO from "./utils/io.js";
-import * as Point from "./utils/point.js";
-import * as Matrix from "./utils/matrix.js";
+import * as IO from "./utils/io";
+import * as Point from "./utils/point";
+import * as Matrix from "./utils/matrix";
 
 const DIRECTIONS: readonly Point.RO[] = [
   [0, 1],
@@ -43,8 +43,8 @@ function part2() {
 function countXmas(m: Matrix.RO<string>): number {
   let acc = 0;
 
-  for (const [v, row, col] of Matrix.iter(m)) {
-    if (v === "X") {
+  for (const [tile, row, col] of Matrix.iter(m)) {
+    if (tile === "X") {
       for (const dir of DIRECTIONS) {
         acc += search("XMAS", [row, col], dir, m) ? 1 : 0;
       }
@@ -56,11 +56,11 @@ function countXmas(m: Matrix.RO<string>): number {
 
 function countMas(m: Matrix.RO<string>): number {
   let acc = 0;
-  for (const [v, row, col] of Matrix.iter(m)) {
-    if (v === "A") {
+  for (const [tile, row, col] of Matrix.iter(m)) {
+    if (tile === "A") {
       const cornerValue = CORNERS.map((pos) => {
         const newPos = Point.move([row, col], pos);
-        return m[newPos[0]][newPos[1]] ?? "";
+        return m[newPos[0]]?.[newPos[1]] ?? "";
       }).join("");
 
       if (CORNER_VALUES.includes(cornerValue)) {
@@ -78,11 +78,11 @@ function search(
   delta: Point.RO,
   m: Matrix.RO<string>,
 ): boolean {
-  if (pattern.length == 0) {
+  if (pattern.length === 0) {
     return true;
   }
 
-  if (pattern[0] !== m[pos[0]][pos[1]]) {
+  if (pattern[0] !== m[pos[0]]?.[pos[1]]) {
     return false;
   }
 

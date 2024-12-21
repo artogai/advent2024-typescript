@@ -1,8 +1,8 @@
 import { log } from "console";
-import * as Arrays from "./utils/arrays.js";
-import * as Matrix from "./utils/matrix.js";
-import * as Direction from "./utils/direction.js";
-import * as Point from "./utils/point.js";
+import * as Arrays from "./utils/arrays";
+import * as Matrix from "./utils/matrix";
+import * as Direction from "./utils/direction";
+import * as Point from "./utils/point";
 
 const trailHead = 0;
 const trailEnd = 9;
@@ -14,8 +14,8 @@ function part1() {
   const heights = Matrix.readFile("./input/day10.txt", (s) => Number(s));
   let scoresSum = 0;
 
-  for (const [v, row, col] of Matrix.iter(heights)) {
-    if (v === trailHead) {
+  for (const [tile, row, col] of Matrix.iter(heights)) {
+    if (tile === trailHead) {
       const ratings = calcRatings([row, col], heights);
       const score = countScore(ratings);
       scoresSum += score;

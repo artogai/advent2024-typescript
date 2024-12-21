@@ -1,7 +1,7 @@
 import { log } from "console";
-import * as Point from "./utils/point.js";
-import * as Matrix from "./utils/matrix.js";
-import * as Direction from "./utils/direction.js";
+import * as Point from "./utils/point";
+import * as Matrix from "./utils/matrix";
+import * as Direction from "./utils/direction";
 
 type CornerPoint = Readonly<{
   delta: Point.RO;

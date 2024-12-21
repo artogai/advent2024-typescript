@@ -1,9 +1,9 @@
 import { log } from "console";
-import * as Arrays from "./utils/arrays.js";
-import * as Matrix from "./utils/matrix.js";
-import * as IO from "./utils/io.js";
-import * as Direction from "./utils/direction.js";
-import * as Point from "./utils/point.js";
+import * as Arrays from "./utils/arrays";
+import * as Matrix from "./utils/matrix";
+import * as IO from "./utils/io";
+import * as Direction from "./utils/direction";
+import * as Point from "./utils/point";
 
 type Wall = "#";
 type Box = "O";

@@ -1,5 +1,5 @@
 import { log } from "console";
-import * as IO from "./utils/io.js";
+import * as IO from "./utils/io";
 
 const MUL_OP = /mul\((\d+),(\d+)\)/g;
 const MUL_OP_WITH_INSTR = /do\(\)|don't\(\)|mul\((\d+),(\d+)\)/g;

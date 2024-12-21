@@ -1,5 +1,5 @@
 import { log } from "console";
-import * as IO from "./utils/io.js";
+import * as IO from "./utils/io";
 
 type Operation = "+" | "*" | "||";
 

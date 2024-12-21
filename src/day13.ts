@@ -1,7 +1,7 @@
 import { log } from "console";
-import * as IO from "./utils/io.js";
-import * as Point from "./utils/point.js";
-import * as Arrays from "./utils/arrays.js";
+import * as IO from "./utils/io";
+import * as Point from "./utils/point";
+import * as Arrays from "./utils/arrays";
 
 const offset = 10000000000000;
 

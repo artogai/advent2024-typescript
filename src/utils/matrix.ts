@@ -1,4 +1,6 @@
 import * as Arrays from "./arrays.js";
+import * as Point from "./point.js";
+import * as IO from "./io.js";
 
 export type RW<A> = A[][];
 export type RO<A> = ReadonlyArray<ReadonlyArray<A>>;
@@ -7,10 +9,7 @@ export function copy<A>(m: RO<A>): RW<A> {
   return Array.from(m, (row) => Array.from(row));
 }
 
-export function create<A>(
-  dim: readonly [number, number],
-  defaultValue: () => A,
-): RW<A> {
+export function create<A>(dim: Point.RO, defaultValue: () => A): RW<A> {
   return Array.from({ length: dim[0] }, () =>
     Array.from({ length: dim[1] }, defaultValue),
   );
@@ -20,11 +19,11 @@ export function createSquare<A>(dim: number, defaultValue: () => A): RW<A> {
   return create([dim, dim], defaultValue);
 }
 
-export function createAs<A>(m: RO<A>, defaultValue: () => A): RW<A> {
+export function createAs<A, B>(m: RO<A>, defaultValue: () => B): RW<B> {
   return create(dim(m), defaultValue);
 }
 
-export function dim<A>(m: RO<A>): [number, number] {
+export function dim<A>(m: RO<A>): Point.RW {
   if (m.length === 0) return [0, 0];
   return [m.length, m[0].length];
 }
@@ -37,10 +36,12 @@ export function* iter<A>(m: RO<A>) {
   }
 }
 
-export function map<A, B>(
-  m: RO<A>,
-  f: (v: A, idx: [number, number]) => B,
-): RW<B> {
+export function isInBounds<A>(p: Point.RO, m: RO<A>): boolean {
+  const [rows, cols] = dim(m);
+  return p[0] >= 0 && p[0] < rows && p[1] >= 0 && p[1] < cols;
+}
+
+export function map<A, B>(m: RO<A>, f: (v: A, idx: Point.RO) => B): RW<B> {
   return m.map((arr, row) => arr.map((v, col) => f(v, [row, col])));
 }
 
@@ -55,6 +56,42 @@ export function equal<A>(
   );
 }
 
-export function show<A>(m: RO<A>, showA: (v: A) => string): string {
-  return m.map((row) => row.map(showA).join("")).join("\n");
+export function find<A>(
+  m: RO<A>,
+  pred: (tile: A) => boolean,
+): Point.RW | undefined {
+  for (const [tile, row, col] of iter(m)) {
+    if (pred(tile)) {
+      return [row, col];
+    }
+  }
+}
+
+export function show<A>(m: RO<A>, showA?: (tile: A) => string): string {
+  return m
+    .map((row) => row.map((v) => (showA ? showA(v) : String(v))).join(""))
+    .join("\n");
+}
+
+export function parseLines<A>(
+  lines: readonly string[],
+  p: (s: string, row: number, col: number) => A,
+): RW<A> {
+  return lines.map((line, row) =>
+    line.split("").map((s, col) => p(s, row, col)),
+  );
+}
+
+export function parse<A>(
+  s: string,
+  p: (s: string, row: number, col: number) => A,
+): RW<A> {
+  return parseLines(s.split("\n"), p);
+}
+
+export function readFile<A>(
+  path: string,
+  p: (s: string, row: number, col: number) => A,
+): RW<A> {
+  return parseLines(IO.readLines(path), p);
 }

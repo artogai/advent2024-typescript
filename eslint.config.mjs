@@ -29,6 +29,7 @@ export default tseslint.config(
   },
   {
     rules: {
+      "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/switch-exhaustiveness-check": "error",
       "@typescript-eslint/no-unused-vars": [
         "error",

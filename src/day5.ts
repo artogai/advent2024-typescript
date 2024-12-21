@@ -1,11 +1,12 @@
 import { log } from "console";
-import { arraysEqual, readLines } from "./utils.js";
+import * as IO from "./utils/io.js";
+import * as Arrays from "./utils/arrays.js";
 
 part1();
 part2();
 
 function part1() {
-  const [rules, updates] = parse();
+  const [rules, updates] = parse("./input/day5.txt");
 
   const res = updates
     .filter((upd) => {
@@ -19,7 +20,7 @@ function part1() {
 }
 
 function part2() {
-  const [rules, updates] = parse();
+  const [rules, updates] = parse("./input/day5.txt");
 
   const res = updates
     .filter((upd) => {
@@ -37,7 +38,7 @@ function part2() {
 
 function fixOrder(
   upd: readonly number[],
-  rules: readonly [number, number][],
+  rules: readonly (readonly [number, number])[],
 ): number[] {
   let fixed = false;
   const updCopy = upd.slice();
@@ -47,7 +48,7 @@ function fixOrder(
 
     for (let i = 0; i < updCopy.length - 1; i++) {
       for (let j = i + 1; j < updCopy.length; j++) {
-        if (rules.some((arr) => arraysEqual(arr, [updCopy[j], updCopy[i]]))) {
+        if (rules.some((arr) => Arrays.equal(arr, [updCopy[j], updCopy[i]]))) {
           fixed = false;
           const temp = updCopy[i];
           updCopy[i] = updCopy[j];
@@ -62,11 +63,11 @@ function fixOrder(
 
 function checkUpdates(
   upd: readonly number[],
-  rules: readonly [number, number][],
+  rules: readonly (readonly [number, number])[],
 ): boolean {
   for (let i = 0; i < upd.length - 1; i++) {
     for (let j = i + 1; j < upd.length; j++) {
-      if (rules.some((arr) => arraysEqual(arr, [upd[j], upd[i]]))) {
+      if (rules.some((arr) => Arrays.equal(arr, [upd[j], upd[i]]))) {
         return false;
       }
     }
@@ -79,8 +80,8 @@ function middle(upd: readonly number[]): number {
   return upd[Math.floor(upd.length / 2)];
 }
 
-function parse(): [[number, number][], number[][]] {
-  const [l, r] = readLines("./input/day5.txt").reduce<string[][]>((acc, s) => {
+function parse(path: string): [[number, number][], number[][]] {
+  const [l, r] = IO.readLines(path).reduce<string[][]>((acc, s) => {
     if (s === "") {
       acc.push([]);
     } else {

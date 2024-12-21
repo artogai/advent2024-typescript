@@ -1,7 +1,9 @@
 import { log } from "console";
-import { arraySplit, readLines } from "./utils.js";
+import * as IO from "./utils/io.js";
+import * as Point from "./utils/point.js";
+import * as Arrays from "./utils/arrays.js";
 
-const OFFSET = 10000000000000;
+const offset = 10000000000000;
 
 part(false);
 part(true);
@@ -11,7 +13,7 @@ function part(isOffsetEnabled: boolean) {
     const [aCnt, bCnt] = solve(
       m[0],
       m[1],
-      isOffsetEnabled ? applyOffset(m[2]) : m[2],
+      isOffsetEnabled ? Point.move(m[2], [offset, offset]) : m[2],
     ) ?? [0, 0];
     return acc + bCnt + aCnt * 3;
   }, 0);
@@ -19,15 +21,7 @@ function part(isOffsetEnabled: boolean) {
   log(res);
 }
 
-function applyOffset(p: readonly [number, number]): [number, number] {
-  return [OFFSET + p[0], OFFSET + p[1]];
-}
-
-function solve(
-  a: readonly [number, number],
-  b: readonly [number, number],
-  p: readonly [number, number],
-): [number, number] | undefined {
+function solve(a: Point.RO, b: Point.RO, p: Point.RO): Point.RW | undefined {
   const d = det(a, b);
   if (d === 0) {
     return undefined;
@@ -43,18 +37,15 @@ function solve(
   return [res0, res1];
 }
 
-function det(
-  a: readonly [number, number],
-  b: readonly [number, number],
-): number {
+function det(a: Point.RO, b: Point.RO): number {
   return a[0] * b[1] - a[1] * b[0];
 }
 
-function parse(path: string): [number, number][][] {
-  return arraySplit(readLines(path), "").map(parseMachine);
+function parse(path: string): Point.RW[][] {
+  return Arrays.split(IO.readLines(path), "").map(parseMachine);
 }
 
-function parseMachine(input: string[]): [number, number][] {
+function parseMachine(input: string[]): Point.RW[] {
   return input.flatMap((line) => {
     const matches = line.match(/\d+/g);
     if (!matches || matches.length != 2) {

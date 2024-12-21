@@ -1,5 +1,5 @@
 import { log } from "console";
-import { readLines } from "./utils.js";
+import * as IO from "./utils/io.js";
 
 type Operation = "+" | "*" | "||";
 
@@ -17,7 +17,7 @@ function part2() {
 }
 
 function countCalibration(path: string, opsSet: Operation[]): number {
-  return readLines(path)
+  return IO.readLines(path)
     .map(parseLine)
     .filter(({ res, operands }) => isValidResult(res, operands, opsSet))
     .reduce((acc, v) => acc + v.res, 0);

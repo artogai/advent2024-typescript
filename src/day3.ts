@@ -1,5 +1,5 @@
 import { log } from "console";
-import { readLines } from "./utils.js";
+import * as IO from "./utils/io.js";
 
 const MUL_OP = /mul\((\d+),(\d+)\)/g;
 const MUL_OP_WITH_INSTR = /do\(\)|don't\(\)|mul\((\d+),(\d+)\)/g;
@@ -8,17 +8,19 @@ part1();
 part2();
 
 function part1() {
-  const res = readLines("./input/day3.txt").reduce((acc, line) => {
-    return acc + parseMemory(line);
-  }, 0);
+  const res = IO.readLines("./input/day3.txt").reduce(
+    (acc, line) => acc + parseMemory(line),
+    0,
+  );
 
   log(res);
 }
 
 function part2() {
-  const res = readLines("./input/day3.txt").reduce((acc, line) => {
-    return acc + parseMemoryWithInstructions(line);
-  }, 0);
+  const res = IO.readLines("./input/day3.txt").reduce(
+    (acc, line) => acc + parseMemoryWithInstructions(line),
+    0,
+  );
 
   log(res);
 }

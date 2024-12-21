@@ -1,90 +1,71 @@
 import { log } from "console";
-import { readLines } from "./utils.js";
+import * as Point from "./utils/point.js";
+import * as Matrix from "./utils/matrix.js";
+import * as Direction from "./utils/direction.js";
+import * as Arrays from "./utils/arrays.js";
 
-type Direction = "^" | "v" | ">" | "<";
-type Obstacle = "#";
+type Wall = "#";
 type Empty = ".";
 
-type Field = Direction | Obstacle | Empty;
-type TerritoryMap = Field[][];
+type Tile = Direction.Direction | Wall | Empty;
 
-const ALL_DIRECTIONS: Direction[] = ["^", "v", ">", "<"];
+part1();
+part2();
 
-function isDirection(field: Field): field is Direction {
-  return ALL_DIRECTIONS.includes(field as Direction);
+function part1() {
+  const m = Matrix.readFile("./input/day6.txt", (s) => s as Tile);
+  const start = Matrix.find(m, (t) => t === "^") ?? [0, 0];
+  traverse(start, m);
+  const traversedCnt = countTraversed(m);
+
+  log(traversedCnt);
 }
 
-function copyMap(m: TerritoryMap): TerritoryMap {
-  return m.map((row) => [...row]);
-}
+function part2() {
+  const m = Matrix.readFile("./input/day6.txt", (s) => s as Tile);
+  const start = Matrix.find(m, (t) => t === "^") ?? [0, 0];
 
-const Direction2DirectionDelta: Record<Direction, readonly [number, number]> = {
-  "^": [-1, 0],
-  v: [1, 0],
-  ">": [0, 1],
-  "<": [0, -1],
-};
+  const mc = Matrix.copy(m);
+  traverse(start, mc);
 
-function directionDelta2Direction(d: readonly [number, number]): Direction {
-  if (d[0] === -1 && d[1] === 0) {
-    return "^";
-  } else if (d[0] === 1 && d[1] === 0) {
-    return "v";
-  } else if (d[0] === 0 && d[1] === 1) {
-    return ">";
-  } else if (d[0] === 0 && d[1] === -1) {
-    return "<";
-  } else {
-    throw new Error(
-      `unknow direction delta: ${d[0].toString()} ${d[1].toString()}`,
-    );
-  }
-}
+  let acc = 0;
 
-function turn(d: Direction): Direction {
-  const delta = Direction2DirectionDelta[d];
-  const deltaTurned: [number, number] = [delta[1], -delta[0]];
-  return directionDelta2Direction(deltaTurned);
-}
+  for (const [tile, row, col] of Matrix.iter(mc)) {
+    if (row === start[0] && col === start[1]) {
+      continue;
+    }
 
-function parseMap(path: string): TerritoryMap {
-  return readLines(path).map((line) =>
-    line.split("").map((c) => c as Direction),
-  );
-}
+    // it makes sense to place obstacles only on previous path
+    if (!Direction.is(tile)) {
+      continue;
+    }
 
-function findStart(
-  m: TerritoryMap,
-  dir: Direction = "^",
-): [number, number] | undefined {
-  for (let i = 0; i < m.length; i++) {
-    for (let j = 0; j < m[i].length; j++) {
-      if (m[i][j] === dir) {
-        return [i, j];
-      }
+    const mc2 = Matrix.copy(m);
+    mc2[row][col] = "#";
+    const isCycle = !traverse(start, mc2);
+    if (isCycle) {
+      acc++;
     }
   }
-
-  return undefined;
+  log(acc);
 }
 
 function traverse(
-  start: readonly [number, number],
-  m: TerritoryMap,
-  dir: Direction = "^",
+  start: Point.RO,
+  m: Matrix.RW<Tile>,
+  dir: Direction.Direction = "^",
 ): boolean {
+  const pathFlagsByDirection = new Map(
+    Direction.values.map(
+      (dir) => [dir, Matrix.createAs(m, () => false)] as const,
+    ),
+  );
+
   let [currRow, currCol] = start;
   let currDir = dir;
 
-  const pathFlagsByDirection = new Map(
-    ALL_DIRECTIONS.map((dir) => [dir, createBooleanArray(m)]),
-  );
-
   traverse: for (;;) {
-    const pathFlags = pathFlagsByDirection.get(currDir);
-    if (pathFlags === undefined) {
-      throw new Error(`flags not specified for direction $currDir`);
-    }
+    const pathFlags = pathFlagsByDirection.get(currDir)!;
 
     if (pathFlags[currRow][currCol]) {
       // cycle detected
@@ -94,8 +75,7 @@ function traverse(
     pathFlags[currRow][currCol] = true;
 
     m[currRow][currCol] = currDir;
-    const currDelta = Direction2DirectionDelta[currDir];
-    const [nextRow, nextCol] = [currRow + currDelta[0], currCol + currDelta[1]];
+    const [nextRow, nextCol] = Direction.move([currRow, currCol], currDir);
 
     const nextField = safeAt(safeAt(m, nextRow), nextCol);
 
@@ -103,7 +83,7 @@ function traverse(
       case undefined:
         break traverse;
       case "#":
-        currDir = turn(currDir);
+        currDir = Direction.rotate90(currDir);
         break;
       case ".":
       case "^":
@@ -119,10 +99,8 @@ function traverse(
   return true;
 }
 
-function countTraversed(m: TerritoryMap): number {
-  return m
-    .map((row) => row.filter(isDirection))
-    .reduce((acc, row) => acc + row.length, 0);
+function countTraversed(m: Matrix.RO<Tile>): number {
+  return Arrays.sum(m.map((row) => row.filter(Direction.is).length));
 }
 
 // ignores negative indexes
@@ -132,50 +110,3 @@ function safeAt<A>(arr: readonly A[] | undefined, idx: number): A | undefined {
   }
   return arr[idx];
 }
-
-function createBooleanArray<A>(original: A[][]): boolean[][] {
-  return original.map((row) => row.map(() => false));
-}
-
-function part1() {
-  const m = parseMap("./input/day6.txt");
-  const start = findStart(m) ?? [0, 0];
-  traverse(start, m);
-  const traversedCnt = countTraversed(m);
-
-  log(traversedCnt);
-}
-
-function part2() {
-  const m = parseMap("./input/day6.txt");
-  const start = findStart(m) ?? [0, 0];
-
-  const mc = copyMap(m);
-  traverse(start, mc);
-
-  let acc = 0;
-
-  for (let i = 0; i < m.length; i++) {
-    for (let j = 0; j < m[i].length; j++) {
-      if (i == start[0] && j == start[1]) {
-        continue;
-      }
-      // it makes sense to place obstacles only on previous path
-      if (!isDirection(mc[i][j])) {
-        continue;
-      }
-
-      const mc2 = m.map((row) => [...row]);
-      mc2[i][j] = "#";
-      const isCycle = !traverse(start, mc2);
-      if (isCycle) {
-        acc++;
-      }
-    }
-  }
-
-  log(acc);
-}
-
-part1();
-part2();

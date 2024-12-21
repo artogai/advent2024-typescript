@@ -1,5 +1,6 @@
 import { log } from "console";
-import { readLines, zip } from "./utils.js";
+import * as Arrays from "./utils/arrays.js";
+import * as IO from "./utils/io.js";
 
 part1();
 part2();
@@ -13,20 +14,23 @@ function part2() {
 }
 
 function countPart(skipsEnabled: boolean): number {
-  const levels = readLines("./input/day2.txt").map((line) => {
-    return line.split(" ").map(Number);
-  });
+  const levels = IO.readLines("./input/day2.txt").map((line) =>
+    line.split(" ").map(Number),
+  );
 
   return countSafeLevels(levels, skipsEnabled);
 }
 
-function countSafeLevels(levels: number[][], skipsEnabled: boolean) {
+function countSafeLevels(
+  levels: ReadonlyArray<ReadonlyArray<number>>,
+  skipsEnabled: boolean,
+) {
   return levels.reduce((acc, level) => {
     return isLevelSafe(level, skipsEnabled) ? acc + 1 : acc;
   }, 0);
 }
 
-function isLevelSafe(level: number[], skipsEnabled: boolean): boolean {
+function isLevelSafe(level: readonly number[], skipsEnabled: boolean): boolean {
   if (checkLevel(level)) {
     return true;
   }
@@ -45,8 +49,8 @@ function isLevelSafe(level: number[], skipsEnabled: boolean): boolean {
   return false;
 }
 
-function checkLevel(level: number[]): boolean {
-  return zip(level, level.slice(1))
+function checkLevel(level: readonly number[]): boolean {
+  return Arrays.zip(level, level.slice(1))
     .map(([l, r]) => {
       return l - r;
     })

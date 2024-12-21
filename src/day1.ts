@@ -1,5 +1,6 @@
 import { log } from "console";
-import { readLines, zip, unzip } from "./utils.js";
+import * as Arrays from "./utils/arrays.js";
+import * as IO from "./utils/io.js";
 
 part1();
 part2();
@@ -27,7 +28,7 @@ function part1() {
   left.sort();
   right.sort();
 
-  const res = zip(left, right).reduce(
+  const res = Arrays.zip(left, right).reduce(
     (acc: number, [l, r]: [number, number]): number => {
       return acc + Math.abs(l - r);
     },
@@ -38,8 +39,8 @@ function part1() {
 }
 
 function readLocationsIds(): [number[], number[]] {
-  return unzip(
-    readLines("./input/day1.txt").map(
+  return Arrays.unzip(
+    IO.readLines("./input/day1.txt").map(
       (line) => line.split(/\s+/).map(Number) as [number, number],
     ),
   );

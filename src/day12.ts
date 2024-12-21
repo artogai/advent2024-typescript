@@ -1,29 +1,16 @@
 import { log } from "console";
-import { readLines } from "./utils.js";
-
-type Coord = readonly [number, number];
-
-type Field = ReadonlyArray<ReadonlyArray<string>>;
-
-type MaskMut = boolean[][];
-
-type Mask = ReadonlyArray<ReadonlyArray<boolean>>;
+import * as Point from "./utils/point.js";
+import * as Matrix from "./utils/matrix.js";
+import * as Direction from "./utils/direction.js";
 
 type CornerPoint = Readonly<{
-  delta: Coord;
+  delta: Point.RO;
   isPlanted: boolean;
 }>;
 
 type Corner = ReadonlyArray<CornerPoint>;
 
-type CostFunc = (m: Mask) => number;
-
-const DIRECTIONS: ReadonlyArray<Coord> = [
-  [0, 1],
-  [1, 0],
-  [0, -1],
-  [-1, 0],
-];
+type CostFunc = (m: Matrix.RO<boolean>) => number;
 
 const BASE_CORNERS: ReadonlyArray<Corner> = [
   // XX
@@ -60,11 +47,9 @@ const CORNERS: ReadonlyArray<Corner> = [
 
 const calcArea: CostFunc = (m) => {
   let area = 0;
-  for (let i = 0; i < m.length; i++) {
-    for (let j = 0; j < m[i].length; j++) {
-      if (m[i][j]) {
-        area += 1;
-      }
+  for (const [v] of Matrix.iter(m)) {
+    if (v) {
+      area += 1;
     }
   }
   return area;
@@ -72,14 +57,11 @@ const calcArea: CostFunc = (m) => {
 
 const calcPerimiter: CostFunc = (m) => {
   let perimiter = 0;
-  for (let i = 0; i < m.length; i++) {
-    for (let j = 0; j < m[i].length; j++) {
-      if (m[i][j]) {
-        perimiter += DIRECTIONS.map<[number, number]>((dir) => [
-          i + dir[0],
-          j + dir[1],
-        ]).filter((c) => !isInBounds(c, m) || !m[c[0]][c[1]]).length;
-      }
+  for (const [v, row, col] of Matrix.iter(m)) {
+    if (v) {
+      perimiter += Direction.values
+        .map<Point.RO>((dir) => Direction.move([row, col], dir))
+        .filter((c) => !Matrix.isInBounds(c, m) || !m[c[0]][c[1]]).length;
     }
   }
   return perimiter;
@@ -87,15 +69,13 @@ const calcPerimiter: CostFunc = (m) => {
 
 const calcCorners: CostFunc = (m) => {
   let corners = 0;
-  for (let i = 0; i < m.length; i++) {
-    for (let j = 0; j < m[i].length; j++) {
-      if (m[i][j]) {
-        CORNERS.forEach((points) => {
-          if (points.every((p) => checkPoint([i, j], p, m))) {
-            corners += 1;
-          }
-        });
-      }
+  for (const [v, row, col] of Matrix.iter(m)) {
+    if (v) {
+      CORNERS.forEach((points) => {
+        if (points.every((p) => checkPoint([row, col], p, m))) {
+          corners += 1;
+        }
+      });
     }
   }
   return corners;
@@ -108,39 +88,37 @@ part(part1Cost);
 part(part2Cost);
 
 function part(costFunc: CostFunc) {
-  const field = parseField("./input/day12.txt");
+  const field = Matrix.readFile("./input/day12.txt", (s) => s);
   const areas = genAreas(field);
   const res = areas.reduce((acc, a) => acc + costFunc(a), 0);
   log(res);
 }
 
-function parseField(path: string): Field {
-  return readLines(path).map((line) => line.split(""));
-}
-
-function genAreas(f: Field): MaskMut[] {
-  const areas: MaskMut[] = [];
-  for (let i = 0; i < f.length; i++) {
-    for (let j = 0; j < f[i].length; j++) {
-      if (areas.some((area) => area[i][j])) {
-        continue;
-      }
-      areas.push(traverseArea([i, j], f));
+function genAreas(m: Matrix.RO<string>): Matrix.RW<boolean>[] {
+  const areas: Matrix.RW<boolean>[] = [];
+  for (const [_, row, col] of Matrix.iter(m)) {
+    if (areas.some((area) => area[row][col])) {
+      continue;
     }
+    areas.push(traverseArea([row, col], m));
   }
   return areas;
 }
 
-function traverseArea(start: Coord, f: Field): MaskMut {
-  const mask = createEmptyMask(f);
+function traverseArea(
+  start: Point.RO,
+  m: Matrix.RO<string>,
+): Matrix.RW<boolean> {
+  const mask = Matrix.createAs(m, () => false);
 
-  function rec(c: Coord) {
-    mask[c[0]][c[1]] = true;
+  function rec(pos: Point.RO) {
+    mask[pos[0]][pos[1]] = true;
 
-    DIRECTIONS.map<[number, number]>((dir) => [c[0] + dir[0], c[1] + dir[1]])
-      .filter((nc) => isInBounds(nc, f))
+    Direction.values
+      .map((dir) => Direction.move(pos, dir))
+      .filter((nc) => Matrix.isInBounds(nc, m))
       .filter((nc) => !mask[nc[0]][nc[1]])
-      .filter((nc) => f[nc[0]][nc[1]] === f[c[0]][c[1]])
+      .filter((nc) => m[nc[0]][nc[1]] === m[pos[0]][pos[1]])
       .forEach(rec);
   }
 
@@ -149,19 +127,15 @@ function traverseArea(start: Coord, f: Field): MaskMut {
   return mask;
 }
 
-function checkPoint(c: Coord, p: CornerPoint, m: Mask): boolean {
-  const row = c[0] + p.delta[0];
-  const col = c[1] + p.delta[1];
-
-  return isInBounds([row, col], m) ? p.isPlanted === m[row][col] : !p.isPlanted;
-}
-
-function createEmptyMask<A>(m: ReadonlyArray<ReadonlyArray<A>>): MaskMut {
-  return m.map((row) => row.map((_) => false));
-}
-
-function isInBounds<A>(c: Coord, m: ReadonlyArray<ReadonlyArray<A>>): boolean {
-  return c[0] >= 0 && c[0] < m.length && c[1] >= 0 && c[1] < m[0].length;
+function checkPoint(
+  p: Point.RO,
+  c: CornerPoint,
+  m: Matrix.RO<boolean>,
+): boolean {
+  const [row, col] = Point.move(p, c.delta);
+  return Matrix.isInBounds([row, col], m)
+    ? c.isPlanted === m[row][col]
+    : !c.isPlanted;
 }
 
 function rotate90(corner: Corner): Corner {

@@ -1,11 +1,12 @@
 import * as Matrix from "./utils/matrix.js";
-import { readLines } from "./utils.js";
 import { log } from "console";
 import { createHash } from "crypto";
+import * as IO from "./utils/io.js";
+import * as Point from "./utils/point.js";
 
-const DIM = [103, 101] as const;
+const dim = [103, 101] as const;
 
-type Robot = Readonly<{ id: number; velocity: readonly [number, number] }>;
+type Robot = Readonly<{ id: number; velocity: Point.RO }>;
 
 type Tile = Robot[];
 
@@ -13,7 +14,7 @@ part1();
 part2();
 
 function part1() {
-  let m = parse(DIM, "./input/day14.txt");
+  let m = parse(dim, "./input/day14.txt");
   for (let i = 0; i < 100; i++) {
     m = tick(m);
   }
@@ -26,7 +27,7 @@ function part1() {
 }
 
 function part2() {
-  let m = parse(DIM, "./input/day14.txt");
+  let m = parse(dim, "./input/day14.txt");
 
   for (let i = 0; i < 8149; i++) {
     m = tick(m);
@@ -37,7 +38,7 @@ function part2() {
 
 //eslint-disable-next-line @typescript-eslint/no-unused-vars
 function part2Solution() {
-  let m = parse(DIM, "./input/day14.txt");
+  let m = parse(dim, "./input/day14.txt");
   const mHashes = new Set<string>();
 
   let tree = 69;
@@ -82,11 +83,7 @@ function tick(m: Matrix.RO<Tile>): Matrix.RW<Tile> {
   return nm;
 }
 
-function move(
-  robot: Robot,
-  from: readonly [number, number],
-  m: Matrix.RW<Tile>,
-) {
+function move(robot: Robot, from: Point.RO, m: Matrix.RW<Tile>) {
   const adjust = (coord: number, max: number): number => {
     return coord % max;
   };
@@ -130,10 +127,10 @@ function getQuadrants<A>(m: Matrix.RO<A>): Matrix.RW<A>[] {
   ];
 }
 
-function parse(dim: readonly [number, number], path: string): Matrix.RW<Tile> {
+function parse(dim: Point.RO, path: string): Matrix.RW<Tile> {
   const m = Matrix.create<Tile>(dim, () => []);
 
-  readLines(path)
+  IO.readLines(path)
     .map(parseRobotDesc)
     .forEach((robotDesc, i) => {
       const robot = {
@@ -147,8 +144,8 @@ function parse(dim: readonly [number, number], path: string): Matrix.RW<Tile> {
 }
 
 function parseRobotDesc(s: string): {
-  pos: [number, number];
-  velocity: [number, number];
+  pos: Point.RO;
+  velocity: Point.RO;
 } {
   const res = s.split(" ").map((part) => part.slice(2).split(",").map(Number));
   return {
@@ -158,18 +155,12 @@ function parseRobotDesc(s: string): {
 }
 
 function show(m: Matrix.RO<Tile>): string {
-  return m
-    .map((row) =>
-      row
-        .map((tile) => {
-          if (tile.length === 0) {
-            return ".";
-          }
-          return tile.length.toString();
-        })
-        .join(""),
-    )
-    .join("\n");
+  return Matrix.show(m, (tile) => {
+    if (tile.length === 0) {
+      return ".";
+    }
+    return tile.length.toString();
+  });
 }
 
 function hash(message: string): string {

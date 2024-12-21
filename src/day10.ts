@@ -1,25 +1,22 @@
 import { log } from "console";
-import { arraySum, readLines } from "./utils.js";
+import * as Arrays from "./utils/arrays.js";
+import * as Matrix from "./utils/matrix.js";
+import * as Direction from "./utils/direction.js";
+import * as Point from "./utils/point.js";
 
-const TRAIL_HEAD = 0;
-const TRAIL_END = 9;
-const DIRECTIONS: [number, number][] = [
-  [1, 0],
-  [-1, 0],
-  [0, 1],
-  [0, -1],
-];
+const trailHead = 0;
+const trailEnd = 9;
 
 part1();
 part2();
 
 function part1() {
-  const heights = parse("./input/day10.txt");
+  const heights = Matrix.readFile("./input/day10.txt", (s) => Number(s));
   let scoresSum = 0;
 
-  for (const node of nodes(heights)) {
-    if (isTrailHead(node, heights)) {
-      const ratings = calcRatings(node, heights);
+  for (const [v, row, col] of Matrix.iter(heights)) {
+    if (v === trailHead) {
+      const ratings = calcRatings([row, col], heights);
       const score = countScore(ratings);
       scoresSum += score;
     }
@@ -29,12 +26,12 @@ function part1() {
 }
 
 function part2() {
-  const heights = parse("./input/day10.txt");
+  const heights = Matrix.readFile("./input/day10.txt", (s) => Number(s));
   let ratingsSum = 0;
 
-  for (const node of nodes(heights)) {
-    if (isTrailHead(node, heights)) {
-      const ratings = calcRatings(node, heights);
+  for (const [v, row, col] of Matrix.iter(heights)) {
+    if (v === trailHead) {
+      const ratings = calcRatings([row, col], heights);
       const score = countRating(ratings);
       ratingsSum += score;
     }
@@ -43,79 +40,46 @@ function part2() {
   log(ratingsSum);
 }
 
-function* nodes(graph: number[][]): Generator<[number, number]> {
-  for (let i = 0; i < graph.length; i++) {
-    for (let j = 0; j < graph[i].length; j++) {
-      yield [i, j];
-    }
-  }
-}
-
-function calcRatings(
-  start: readonly [number, number],
-  graph: readonly number[][],
-): number[][] {
-  let queue: (readonly [number, number])[] = [];
-  const counter: number[][] = graph.map((row) => row.map((_) => 0));
+function calcRatings(start: Point.RO, m: Matrix.RO<number>): Matrix.RW<number> {
+  const queue: Point.RO[] = [];
+  const counter = Matrix.createAs(m, () => 0);
 
   queue.push(start);
 
   while (queue.length != 0) {
-    const [node, ...tail] = queue;
+    const pos = queue.shift()!;
 
-    if (graph[node[0]][node[1]] === TRAIL_END) {
-      counter[node[0]][node[1]] += 1;
+    if (m[pos[0]][pos[1]] === trailEnd) {
+      counter[pos[0]][pos[1]] += 1;
     }
 
-    const adj = getAdjacent(node, graph);
+    const adj = getAdjacent(pos, m);
 
-    for (const nextNode of adj) {
-      tail.push(nextNode);
+    for (const nextPos of adj) {
+      queue.push(nextPos);
     }
-
-    queue = tail;
   }
 
   return counter;
 }
 
-function getAdjacent(
-  head: readonly [number, number],
-  graph: readonly number[][],
-): [number, number][] {
-  return DIRECTIONS.map<[number, number]>((dir) => [
-    head[0] + dir[0],
-    head[1] + dir[1],
-  ])
+function getAdjacent(pos: Point.RO, m: Matrix.RO<number>): Point.RW[] {
+  return Direction.values
+    .map<[number, number]>((dir) => Direction.move(pos, dir))
+    .filter((pos) => Matrix.isInBounds(pos, m))
     .filter((node) => {
-      return (
-        node[0] >= 0 &&
-        node[0] < graph.length &&
-        node[1] >= 0 &&
-        node[1] < graph[node[0]].length
-      );
-    })
-    .filter((node) => {
-      const curr = graph[head[0]][head[1]];
-      const next = graph[node[0]][node[1]];
+      const curr = m[pos[0]][pos[1]];
+      const next = m[node[0]][node[1]];
       return next - curr === 1;
     });
 }
 
-function countScore(ratings: readonly number[][]): number {
-  return arraySum(
-    ratings.map((row) => arraySum(row.map((r) => (r !== 0 ? 1 : 0)))),
+function countScore(ratings: Matrix.RO<number>): number {
+  return Arrays.sum(
+    ratings.map((row) => Arrays.sum(row.map((r) => (r !== 0 ? 1 : 0)))),
   );
 }
 
-function countRating(ratings: readonly number[][]): number {
-  return arraySum(ratings.map((row) => arraySum(row)));
-}
-
-function isTrailHead(node: [number, number], heights: number[][]): boolean {
-  return heights[node[0]][node[1]] === TRAIL_HEAD;
-}
-
-function parse(path: string): number[][] {
-  return readLines(path).map((line) => line.split("").map(Number));
+function countRating(ratings: Matrix.RO<number>): number {
+  return Arrays.sum(ratings.map(Arrays.sum));
 }

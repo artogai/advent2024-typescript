@@ -56,3 +56,17 @@ export function unzip<A, B>(arr: readonly [A, B][]): [A[], B[]] {
 export function sum(arr: readonly number[]): number {
   return arr.reduce((prev, curr) => prev + curr, 0);
 }
+
+export function endsWith<A>(arr1: A[], arr2: A[]): boolean {
+  if (arr2.length > arr1.length) {
+    return false;
+  }
+
+  for (let i = 0; i < arr2.length; i++) {
+    if (arr1[arr1.length - arr2.length + i] !== arr2[i]) {
+      return false;
+    }
+  }
+
+  return true;
+}

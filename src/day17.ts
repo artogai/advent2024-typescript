@@ -40,7 +40,7 @@ function checkDecompiled(A: bigint, i: number): boolean {
   let B = BigInt(0);
   let C = BigInt(0);
 
-  for (; ;) {
+  for (;;) {
     B = A % BigInt(8);
     B ^= BigInt(3);
     C = A / (BigInt(1) << B);

@@ -30,7 +30,7 @@ function part2() {
 
   let acc = 0;
 
-  for (const [tile, row, col] of Matrix.iter(mc)) {
+  for (const [tile, [row, col]] of Matrix.iter(mc)) {
     if (row === start[0] && col === start[1]) {
       continue;
     }

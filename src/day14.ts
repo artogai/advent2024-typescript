@@ -74,9 +74,9 @@ function part2Solution() {
 function tick(m: Matrix.RO<Tile>): Matrix.RW<Tile> {
   const nm = Matrix.createAs(m, () => []);
 
-  for (const [tile, row, col] of Matrix.iter(m)) {
+  for (const [tile, p] of Matrix.iter(m)) {
     for (const robot of tile) {
-      move(robot, [row, col], nm);
+      move(robot, p, nm);
     }
   }
 

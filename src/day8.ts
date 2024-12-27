@@ -32,9 +32,7 @@ function calcAntinodes(
 ): number {
   const antennasIdx = createAntennasIndex(m);
 
-  for (const [_, row, col] of Matrix.iter(m)) {
-    const p = [row, col] as const;
-
+  for (const [_, p] of Matrix.iter(m)) {
     if (checkAntinode(p, antennasIdx, skipDistance)) {
       writeAntinode(p, m);
     }
@@ -57,9 +55,8 @@ function parse(path: string): Matrix.RW<Tile> {
 function createAntennasIndex(m: Matrix.RO<Tile>): Map<string, Point.RO[]> {
   const idx = new Map<string, Point.RO[]>();
 
-  for (const [tile, row, col] of Matrix.iter(m)) {
+  for (const [tile, c] of Matrix.iter(m)) {
     if (tile.kind === "antenna") {
-      const c = [row, col] as const;
       const cs = idx.get(tile.id);
 
       if (cs) {

@@ -14,9 +14,9 @@ function part1() {
   const heights = Matrix.readFile("./input/day10.txt", (s) => Number(s));
   let scoresSum = 0;
 
-  for (const [tile, row, col] of Matrix.iter(heights)) {
+  for (const [tile, p] of Matrix.iter(heights)) {
     if (tile === trailHead) {
-      const ratings = calcRatings([row, col], heights);
+      const ratings = calcRatings(p, heights);
       const score = countScore(ratings);
       scoresSum += score;
     }
@@ -29,9 +29,9 @@ function part2() {
   const heights = Matrix.readFile("./input/day10.txt", (s) => Number(s));
   let ratingsSum = 0;
 
-  for (const [v, row, col] of Matrix.iter(heights)) {
+  for (const [v, p] of Matrix.iter(heights)) {
     if (v === trailHead) {
-      const ratings = calcRatings([row, col], heights);
+      const ratings = calcRatings(p, heights);
       const score = countRating(ratings);
       ratingsSum += score;
     }

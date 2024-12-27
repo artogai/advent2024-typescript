@@ -155,9 +155,9 @@ function expand(m: Matrix.RO<Tile>): Matrix.RW<Tile> {
 }
 
 function findRobot(m: Matrix.RO<Tile>): Point.RW | undefined {
-  for (const [tile, row, col] of Matrix.iter(m)) {
+  for (const [tile, p] of Matrix.iter(m)) {
     if (tile === "@") {
-      return [row, col];
+      return p;
     }
   }
   return undefined;
@@ -166,7 +166,7 @@ function findRobot(m: Matrix.RO<Tile>): Point.RW | undefined {
 function calcGpsCoord(m: Matrix.RO<Tile>): number {
   let res = 0;
 
-  for (const [tile, row, col] of Matrix.iter(m)) {
+  for (const [tile, [row, col]] of Matrix.iter(m)) {
     if (tile === "O" || tile === "[") {
       res += row * 100 + col;
     }

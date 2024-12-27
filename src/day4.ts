@@ -43,10 +43,10 @@ function part2() {
 function countXmas(m: Matrix.RO<string>): number {
   let acc = 0;
 
-  for (const [tile, row, col] of Matrix.iter(m)) {
+  for (const [tile, p] of Matrix.iter(m)) {
     if (tile === "X") {
       for (const dir of DIRECTIONS) {
-        acc += search("XMAS", [row, col], dir, m) ? 1 : 0;
+        acc += search("XMAS", p, dir, m) ? 1 : 0;
       }
     }
   }
@@ -56,10 +56,10 @@ function countXmas(m: Matrix.RO<string>): number {
 
 function countMas(m: Matrix.RO<string>): number {
   let acc = 0;
-  for (const [tile, row, col] of Matrix.iter(m)) {
+  for (const [tile, p] of Matrix.iter(m)) {
     if (tile === "A") {
       const cornerValue = CORNERS.map((pos) => {
-        const newPos = Point.move([row, col], pos);
+        const newPos = Point.move(p, pos);
         return m[newPos[0]]?.[newPos[1]] ?? "";
       }).join("");
 

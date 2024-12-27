@@ -31,7 +31,7 @@ export function dim<A>(m: RO<A>): Point.RW {
 export function* iter<A>(m: RO<A>) {
   for (let row = 0; row < m.length; row++) {
     for (let col = 0; col < m[row].length; col++) {
-      yield [m[row][col], row, col] as [A, number, number];
+      yield [m[row][col], [row, col]] as [A, [number, number]];
     }
   }
 }
@@ -60,9 +60,9 @@ export function find<A>(
   m: RO<A>,
   pred: (tile: A) => boolean,
 ): Point.RW | undefined {
-  for (const [tile, row, col] of iter(m)) {
+  for (const [tile, p] of iter(m)) {
     if (pred(tile)) {
-      return [row, col];
+      return p;
     }
   }
 }

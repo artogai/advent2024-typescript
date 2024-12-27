@@ -57,10 +57,10 @@ const calcArea: CostFunc = (m) => {
 
 const calcPerimiter: CostFunc = (m) => {
   let perimiter = 0;
-  for (const [v, row, col] of Matrix.iter(m)) {
+  for (const [v, p] of Matrix.iter(m)) {
     if (v) {
       perimiter += Direction.values
-        .map<Point.RO>((dir) => Direction.move([row, col], dir))
+        .map<Point.RO>((dir) => Direction.move(p, dir))
         .filter((c) => !Matrix.isInBounds(c, m) || !m[c[0]][c[1]]).length;
     }
   }
@@ -69,10 +69,10 @@ const calcPerimiter: CostFunc = (m) => {
 
 const calcCorners: CostFunc = (m) => {
   let corners = 0;
-  for (const [v, row, col] of Matrix.iter(m)) {
+  for (const [v, c] of Matrix.iter(m)) {
     if (v) {
       CORNERS.forEach((points) => {
-        if (points.every((p) => checkPoint([row, col], p, m))) {
+        if (points.every((p) => checkPoint(c, p, m))) {
           corners += 1;
         }
       });
@@ -96,7 +96,7 @@ function part(costFunc: CostFunc) {
 
 function genAreas(m: Matrix.RO<string>): Matrix.RW<boolean>[] {
   const areas: Matrix.RW<boolean>[] = [];
-  for (const [_, row, col] of Matrix.iter(m)) {
+  for (const [_, [row, col]] of Matrix.iter(m)) {
     if (areas.some((area) => area[row][col])) {
       continue;
     }
